@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React,{useContext} from 'react';
 import { SafeAreaView, View, TouchableOpacity, Linking } from 'react-native';
 import CommonStyles from '../../components/Shared/CommonStyles';
 import SimpleText from '../templates/Text/SimpleText';
@@ -7,6 +7,8 @@ import Menu from '../../assets/svg/Menu';
 import Colors from '../../constants/Colors';
 import { FixedWidthButton } from '../templates/Buttons/buttons'
 import { WebView } from 'react-native-webview';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../../AuthProvider';
 
 
 import CookieManager from '@react-native-community/cookies';
@@ -15,11 +17,32 @@ const Home = ({
     navigation
 }) => {
 
+    const { user, login } = useContext(AuthContext);
+    console.log('user in home : ', JSON.stringify(user).includes('li_at'))
+    if(JSON.stringify(user).includes('li_at')){
+        console.log('MyCookie : ','JSESSIONID' + '=' +'"'+ user.JSESSIONID.value+'"' + ';' + 'lang' + '=' + '"'+user.lang.value +'"'+ ';' + 'bcookie'+ '=' 
+        +'"'+user.bcookie.value+'"'+ ';' +'bscookie' + '=' +'"'+user.bscookie.value+'"'+ ';' + 'lidc' + '=' +'"'+ user.lidc.value+'"')
+    }
+    const storeData = async (data) => {
+        try {
+            await AsyncStorage.setItem('@user', JSON.stringify(data));
+            // if(data.li_at !== null){
+            //     await AsyncStorage.setItem('@li_at', JSON.stringify(data.li_at.value));
+            // }
+            // await AsyncStorage.setItem('@token', data.accessToken);
+
+            login(data);
+        } catch (e) {
+            console.log('error saving data', e);
+        }
+    };
+
     const navChange = e => {
         CookieManager.get('https://www.linkedin.com/')
-        .then((cookies) => {
-          console.log('CookieManager.get =>', cookies);
-        });
+            .then((cookies) => {
+                console.log('CookieManager.get =>', cookies);
+                storeData(cookies)
+            });
         console.log("e", e);
         // this.setState({ loading: e.loading });
         if (e.url == "https://www.linkedin.com/") {
@@ -75,17 +98,14 @@ const Home = ({
                 color={Colors.btnPurple}
                 fontWeight={'bold'}
                 alignSelf={'center'} />
-
-            <WebView
+            {!JSON.stringify(user).includes('li_at')  ? <WebView
                 cacheEnabled={false}
                 // ref={ref => (this.webView = ref)}
                 source={{ uri: 'https://www.linkedin.com/' }}
                 style={{ marginTop: 20, flex: 1 }}
                 thirdPartyCookiesEnabled={true}
                 onNavigationStateChange={navChange}
-            />
-
-            {/* <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' , marginVertical:12, paddingHorizontal:18}}>
+            /> : <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginVertical: 12, paddingHorizontal: 18 }}>
                 <View style={{ flex: 1 }}>
                     <FixedWidthButton
                         onPress={() => { navigation.navigate('Home') }}
@@ -106,7 +126,7 @@ const Home = ({
                         alignItems={"center"}
                     />
                 </View>
-                <View style={{ flex: 1, marginHorizontal:22 }} >
+                <View style={{ flex: 1, marginHorizontal: 22 }} >
                     <FixedWidthButton
                         title={'MESSAGING'}
                         disabled={false}
@@ -145,7 +165,11 @@ const Home = ({
                     />
                 </View>
 
-            </View> */}
+            </View>}
+
+
+
+
 
 
 

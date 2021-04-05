@@ -16,46 +16,21 @@ import { FixedWidthButton } from '../../templates/Buttons/buttons'
 
 
 const InviteList = ({
-    navigation, modalVisible, setModal
+    navigation, modalVisible, setModal, mDataList
 
 }) => {
+    var rootURL = ''
+    var restROOT = ''
+    var profileURL = ''
     const [mItem, setItem] = useState({
         id: -1,
         name: '',
         designation: '',
         publicUserName: '',
-        description: ''
+        description: '',
+        image : ''
     })
-    const dataList = [
-        {
-            id: 0,
-            name: 'ABC',
-            designation: 'Software Engineer',
-            publicUserName: 'kbdcbidc_ljdnci42342_oocw323r',
-            description: 'Software Intern at ABC Gulberg Lahore Pakistan'
-        },
-        {
-            id: 1,
-            name: 'ABC DEF',
-            designation: 'Software Quality Engineer',
-            publicUserName: 'kbdcbidc_ljdnci42342_oocw323r',
-            description: 'Software Intern at ABC Gulberg Lahore Pakistan'
-        },
-        {
-            id: 2,
-            name: 'EFG',
-            designation: 'Electrical Engineer',
-            publicUserName: 'kbdcbidc_ljdnci42342_oocw323r',
-            description: 'Software Intern at ABC Gulberg Lahore Pakistan'
-        },
-        {
-            id: 3,
-            name: 'HIJ',
-            designation: 'Data Engineer',
-            publicUserName: 'kbdcbidc_ljdnci42342_oocw323r',
-            description: 'Software Intern at ABC Gulberg Lahore Pakistan'
-        },
-    ]
+   
     return (
         <SafeAreaView style={CommonStyles.container}>
             <View style={{ flexDirection: 'row', margin: 8, width: '100%', }}>
@@ -89,45 +64,61 @@ const InviteList = ({
                 <FlatList
                     contentContainerStyle={{ margin: 4 }}
 
-                    keyExtractor={item => item.id.toString()}
-                    data={dataList}
+                    keyExtractor={item => item.trackingId}
+                    data={mDataList}
                     numColumns={3}
-                    renderItem={({ item }) => {
-                        console.log('item : ', item)
+                    renderItem={({ item }, index) => {
+
+                        if (item.picture != null) {
+                            let picture = item.picture;
+                            console.log('picture : ', picture);
+                            rootURL = picture.rootUrl;
+                            console.log('rootURL : ', rootURL)
+                            restROOT = picture.artifacts[0].fileIdentifyingUrlPathSegment;
+                            console.log('restROOT : ', restROOT)
+                            profileURL = rootURL + restROOT
+
+                        }
+
                         return (
                             <TouchableOpacity
                                 onPress={() => {
                                     console.log('onPress')
                                     setModal(modalVisible)
+
                                     setItem({
-                                        id: item.id,
-                                        name: item.name,
-                                        designation: item.designation,
-                                        publicUserName: item.publicUserName,
-                                        description: item.description
+                                        id: item.trackingId,
+                                        name: item.firstName + ' ' + item.lastName,
+                                        designation: item.occupation,
+                                        publicUserName: item.publicIdentifier,
+                                        description: item.description,
+                                        image: profileURL
                                     })
                                 }}
                                 style={{ margin: 4 }}>
-                                <View style={{
-                                    width: 120, height: 170, borderRadius: 8, backgroundColor: Colors.cardBG,
-                                    justifyContent: 'center', alignItems: 'center', padding: 4
-                                }}>
+                                {item.trackingId && <View style={styles.inviteItem}>
 
-                                    <Image source={require('../../../assets/images/ic_placeholder.png')}
-                                        style={{ width: 60, height: 60, borderRadius: 60 / 2 }} />
-
-                                    <SimpleText
-                                        title={item.name}
-                                        fontSize={14}
-                                        marginTop={4} />
+                                    {profileURL.length > 0 ? <Image source={{ uri: profileURL }}
+                                        style={styles.profileImage} /> :
+                                        <Image source={require('../../../assets/images/ic_placeholder.png')}
+                                            style={styles.profileImage} />}
 
                                     <SimpleText
-                                        title={item.designation}
+                                        title={item.firstName + ' ' + item.lastName}
                                         fontSize={14}
+                                        textAlign={'center'}
+                                        marginTop={12} />
+
+                                    <SimpleText
+                                        width={100}
+                                        title={item.occupation}
+                                        fontSize={12}
                                         marginTop={8}
                                         color={Colors.designation}
-                                        textAlign={'center'} />
-                                </View>
+                                        textAlign={'center'}
+                                        numberOfLines={2}
+                                        ellipsizeMode={'tail'} />
+                                </View>}
                             </TouchableOpacity>
                         );
                     }}
@@ -141,8 +132,10 @@ const InviteList = ({
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Image source={require('../../../assets/images/ic_placeholder.png')}
-                            style={{ width: 60, height: 60, borderRadius: 60 / 2 }} />
+                        {mItem.image.length > 0 ? <Image source={{ uri: mItem.image }}
+                            style={styles.profileImage} /> :
+                            <Image source={require('../../../assets/images/ic_placeholder.png')}
+                                style={styles.profileImage} />}
                         <SimpleText
                             title={'Public UserName : ' + mItem.publicUserName}
                             fontSize={12}
@@ -151,9 +144,10 @@ const InviteList = ({
                             title={'Name : ' + mItem.name}
                             fontSize={12} />
                         <SimpleText
-                            title={mItem.description}
+                            title={mItem.designation}
                             fontSize={12}
-                            marginTop={54} />
+                            textAlign={'center'}
+                            marginTop={24} />
                         <FixedWidthButton
                             title={'Ok'}
                             disabled={false}
@@ -189,12 +183,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        margin: 20
+        margin: 8
     },
     modalView: {
         width: '80%',
         backgroundColor: "white",
-        borderRadius: 20,
+        borderRadius: 16,
         padding: 18,
         alignItems: "center",
         shadowColor: "#000",
@@ -204,7 +198,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,
-        elevation: 5
+        elevation: 3
     },
     button: {
         width: '100%',
@@ -228,6 +222,13 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: "center"
+    },
+    inviteItem: {
+        width: 120, height: 170, borderRadius: 8, backgroundColor: Colors.cardBG,
+        justifyContent: 'center', alignItems: 'center', padding: 4
+    },
+    profileImage: {
+        width: 60, height: 60, borderRadius: 60 / 2
     }
 });
 

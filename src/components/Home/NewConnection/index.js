@@ -20,43 +20,18 @@ const NewConnectionList = ({
 
 }) => {
     const [mItem, setItem] = useState({
-        id : -1,
-        name : '',
-        designation : '',
-        publicUserName : '',
-        description : ''
+        id: -1,
+        name: '',
+        designation: '',
+        publicUserName: '',
+        description: '',
+        image: ''
     })
+    var rootURL = ''
+    var restROOT = ''
+    var profileURL = ''
     console.log('mDataList : ', mDataList)
-    const dataList = [
-        {
-            id: 0,
-            name: 'ABC',
-            designation: 'Software Engineer',
-            publicUserName: 'kbdcbidc_ljdnci42342_oocw323r',
-            description: 'Software Intern at ABC Gulberg Lahore Pakistan'
-        },
-        {
-            id: 1,
-            name: 'ABC DEF',
-            designation: 'Software Quality Engineer',
-            publicUserName: 'kbdcbidc_ljdnci42342_oocw323r',
-            description: 'Software Intern at ABC Gulberg Lahore Pakistan'
-        },
-        {
-            id: 2,
-            name: 'EFG',
-            designation: 'Electrical Engineer',
-            publicUserName: 'kbdcbidc_ljdnci42342_oocw323r',
-            description: 'Software Intern at ABC Gulberg Lahore Pakistan'
-        },
-        {
-            id: 3,
-            name: 'HIJ',
-            designation: 'Data Engineer',
-            publicUserName: 'kbdcbidc_ljdnci42342_oocw323r',
-            description: 'Software Intern at ABC Gulberg Lahore Pakistan'
-        },
-    ]
+
     return (
         <SafeAreaView style={CommonStyles.container}>
             <View style={{ flexDirection: 'row', margin: 8, width: '100%', }}>
@@ -89,22 +64,35 @@ const NewConnectionList = ({
                 <FlatList
                     contentContainerStyle={{ margin: 4 }}
 
-                    keyExtractor={item => item.id.toString()}
-                    data={dataList}
+                    keyExtractor={item => item.publicIdentifier}
+                    data={mDataList}
                     numColumns={3}
-                    renderItem={({ item ,index}) => {
-                        console.log('item : ', item)
+                    renderItem={({ item, index }) => {
+                        // console.log('item : ', item)
+                        if (item.profilePicture != null && item.profilePicture.displayImageReference != null) {
+                            let picture = item.profilePicture.displayImageReference;
+                            console.log('profilePicture : ', picture.vectorImage.rootUrl);
+                            console.log('artifacts : ', picture.vectorImage.artifacts[0].fileIdentifyingUrlPathSegment);
+
+                            rootURL = picture.vectorImage.rootUrl;
+                            console.log('rootURL : ', rootURL);
+                            restROOT = picture.vectorImage.artifacts[0].fileIdentifyingUrlPathSegment;
+                            console.log('restROOT : ', restROOT)
+                            profileURL = rootURL + restROOT
+
+                        }
                         return (
                             <TouchableOpacity
                                 onPress={() => {
                                     console.log('onPress')
                                     setModal(modalVisible)
                                     setItem({
-                                        id : item.id,
-                                        name : item.name,
-                                        designation : item.designation,
-                                        publicUserName : item.publicUserName,
-                                        description : item.description
+                                        id: item.trackingId,
+                                        name: item.firstName + ' ' + item.lastName,
+                                        designation: item.occupation,
+                                        publicUserName: item.publicIdentifier,
+                                        description: item.headline,
+                                        image: profileURL
                                     })
                                 }}
                                 style={{ margin: 4 }}>
@@ -113,20 +101,25 @@ const NewConnectionList = ({
                                     justifyContent: 'center', alignItems: 'center', padding: 4
                                 }}>
 
-                                    <Image source={require('../../../assets/images/ic_placeholder.png')}
-                                        style={{ width: 60, height: 60, borderRadius: 60 / 2 }} />
+                                    {profileURL.length > 0 ? <Image source={{ uri: profileURL }}
+                                        style={styles.profileImage} /> :
+                                        <Image source={require('../../../assets/images/ic_placeholder.png')}
+                                            style={styles.profileImage} />}
 
                                     <SimpleText
-                                        title={item.name}
+                                        title={item.firstName + ' ' + item.lastName}
                                         fontSize={14}
+                                        textAlign={'center'}
                                         marginTop={4} />
 
                                     <SimpleText
-                                        title={item.designation}
-                                        fontSize={14}
+                                        title={item.headline}
+                                        fontSize={12}
                                         marginTop={8}
                                         color={Colors.designation}
-                                        textAlign={'center'} />
+                                        textAlign={'center'}
+                                        numberOfLines={2}
+                                        ellipsizeMode={'tail'} />
                                 </View>
                             </TouchableOpacity>
                         );
@@ -137,23 +130,28 @@ const NewConnectionList = ({
                 animationType="slide"
                 transparent={true}
                 visible={modalVisible}
-                
+
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Image source={require('../../../assets/images/ic_placeholder.png')}
-                            style={{ width: 60, height: 60, borderRadius: 60 / 2 }} />
+                        {mItem.image.length > 0 ? <Image source={{ uri: mItem.image }}
+                            style={styles.profileImage} /> :
+                            <Image source={require('../../../assets/images/ic_placeholder.png')}
+                                style={styles.profileImage} />}
                         <SimpleText
                             title={'Public UserName : ' + mItem.publicUserName}
                             fontSize={12}
-                            marginTop={4} />
+                            marginTop={4} 
+                            textAlign={'center'}/>
                         <SimpleText
-                            title={'Name : ' + mItem.name}
-                            fontSize={12} />
+                            title={'Name : ' + mItem.name }
+                            fontSize={12} 
+                            textAlign={'center'}/>
                         <SimpleText
                             title={mItem.description}
                             fontSize={12}
-                            marginTop={54} />
+                            marginTop={34} 
+                            textAlign={'center'}/>
                         <FixedWidthButton
                             title={'Ok'}
                             disabled={false}
@@ -183,50 +181,54 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        }, centeredView: {
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            margin: 20
+    }, centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        margin: 20
+    },
+    modalView: {
+        width: '80%',
+        backgroundColor: "white",
+        borderRadius: 20,
+        paddingHorizontal: 8,
+        paddingVertical: 18,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
         },
-        modalView: {
-            width: '80%',
-            backgroundColor: "white",
-            borderRadius: 20,
-            padding: 18,
-            alignItems: "center",
-            shadowColor: "#000",
-            shadowOffset: {
-                width: 0,
-                height: 2
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 4,
-            elevation: 5
-        },
-        button: {
-            width: '100%',
-            borderRadius: 20,
-            paddingHorizontal: 14,
-            textAlign: 'center',
-            elevation: 2,
-            backgroundColor: 'blue'
-        },
-        buttonOpen: {
-            backgroundColor: "#F194FF",
-        },
-        buttonClose: {
-            backgroundColor: "#2196F3",
-        },
-        textStyle: {
-            color: "white",
-            fontWeight: "bold",
-            textAlign: "center"
-        },
-        modalText: {
-            marginBottom: 15,
-            textAlign: "center"
-        }
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+    },
+    button: {
+        width: '100%',
+        borderRadius: 20,
+        paddingHorizontal: 14,
+        textAlign: 'center',
+        elevation: 2,
+        backgroundColor: 'blue'
+    },
+    buttonOpen: {
+        backgroundColor: "#F194FF",
+    },
+    buttonClose: {
+        backgroundColor: "#2196F3",
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+    },
+    profileImage: {
+        width: 60, height: 60, borderRadius: 60 / 2
+    }
 
 });
 
