@@ -34,8 +34,10 @@ const SimpleText = props => (
         bottom: props.bottom,
         flex:  props.flex,
         borderWidth : props.borderWidth,
-        borderColor : props.borderColor
-    }}>{props.title}</Text>
+        borderColor : props.borderColor,
+        
+    }} numberOfLines = {props.numberOfLines}
+    ellipsizeMode = {props.ellipsizeMode}>{props.title}</Text>
 );
 
 export default SimpleText;

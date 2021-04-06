@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import {
@@ -14,22 +14,46 @@ import Home from './src/screens/Home/index';
 import NewConnectionListScreen from './src/screens/Home/NewConnectionList/index';
 import LearnMoreScreen from './src/screens/Home/LearnMore/index';
 import InviteListScreen from './src/screens/Home/InviteListScreen/index';
+import { AuthProvider , AuthContext} from './src/AuthProvider';
 
 const Stack = createStackNavigator();
 
 const App = () => {
 
-  const [initialRouteName, setInitialRouteName] = useState('IntroScreen');
+  const [initialRouteName, setInitialRouteName] = useState('');
+  const { user, login } = useContext(AuthContext);
 
   useEffect(() => {
     LogBox.ignoreAllLogs();
-
+    getData()
     SplashScreen.hide();
 
   }, [initialRouteName]);
 
+  const getData = async () => {
+    try {
+      const retrievedItem = await AsyncStorage.getItem('@user');
+      const user = JSON.parse(retrievedItem);
+      if (user !== null) {
+        login(user);
+        console.log('User from Async : ', user.li_at.value);
+        setInitialRouteName('Home')
+      }
+      // setLoading(false);
+      // SplashScreen.hide();
+    } catch (e) {
+      setInitialRouteName('IntroScreen')
+      console.log('error getting stored data');
+    }
+  };
+
+
+
   return (
-    <Navigation initialRouteName={initialRouteName} />
+    <AuthProvider>
+      <Navigation initialRouteName={initialRouteName} />
+    </AuthProvider>
+
   );
 };
 
@@ -39,6 +63,7 @@ const Navigation = ({ initialRouteName }) => {
   if (initialRouteName === '') {
     return null
   }
+  
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={initialRouteName}>
