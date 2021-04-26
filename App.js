@@ -12,9 +12,11 @@ import SplashScreen from 'react-native-splash-screen';
 import IntroScreen from './src/screens/Intro/index';
 import Home from './src/screens/Home/index';
 import NewConnectionListScreen from './src/screens/Home/NewConnectionList/index';
+import MessageSentScreen from './src/screens/Home/MessageSent/index';
 import LearnMoreScreen from './src/screens/Home/LearnMore/index';
 import InviteListScreen from './src/screens/Home/InviteListScreen/index';
 import { AuthProvider , AuthContext} from './src/AuthProvider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 
@@ -71,6 +73,7 @@ const Navigation = ({ initialRouteName }) => {
         <Stack.Screen name="IntroScreen" component={IntroScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
         <Stack.Screen name="NewConnectionListScreen" component={NewConnectionListScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="MessageSentScreen" component={MessageSentScreen} options={{ headerShown: false }} />
         <Stack.Screen name="InviteListScreen" component={InviteListScreen} options={{ headerShown: false }} />
         <Stack.Screen name="LearnMoreScreen" component={LearnMoreScreen} options={{ headerShown: false }} />
 
