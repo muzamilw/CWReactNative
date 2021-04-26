@@ -14,6 +14,8 @@ target 'ConnectWizz' do
 
   pod 'RNSVG', :path => '../node_modules/react-native-svg'
 
+  pod 'RNReanimated', :path => '../node_modules/react-native-reanimated'
+
   target 'ConnectWizzTests' do
     inherit! :complete
     # Pods for testing

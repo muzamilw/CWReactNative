@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Colors from '../../../constants/Colors'
 import SimpleText from '../../templates/Text/SimpleText';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -85,7 +86,8 @@ const CustomSidebarMenu = ({ navigation }) => {
 
         </View>
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity
+      onPress = {() =>{ navigation.navigate('MessageSentScreen')}}>
         <View style={{ paddingHorizontal: 16, paddingVertical: 12, width: '100%', height: 50, flexDirection: 'row', marginBottom: 8 }}>
           <Image source={require('../../../assets/images/ic_people.png')}
             style={{ width: 18, height: 18, resizeMode: 'contain', tintColor: Colors.appBlue }} />

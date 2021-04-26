@@ -26,6 +26,7 @@ const Home = ({
     const storeData = async (data) => {
         try {
             await AsyncStorage.setItem('@user', JSON.stringify(data));
+            await AsyncStorage.setItem('@isLoggedIn', true);
             // if(data.li_at !== null){
             //     await AsyncStorage.setItem('@li_at', JSON.stringify(data.li_at.value));
             // }
